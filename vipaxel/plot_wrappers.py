@@ -29,12 +29,15 @@ def graph_scatter_by_key(
     color = None,
     mode = 'lines',
     group_name: str = None,
-    options: dict = {},
+    options: dict = None,
     fig: go.Figure = None,
     axis = 1,
     theme = 'plotly_dark',
     alt_y_name = None,
 ):
+
+    if options is None:
+        options = {}
 
     if x_title is None:
         x_title = x
@@ -61,9 +64,10 @@ def graph_scatter_by_key(
     else:
         df_evaluated = df 
 
+    # TODO: Fix these copies? 
     data = dict(
-        x = list(df_evaluated[x]), # Latest version of plotly needs hits?
-        y = list(df_evaluated[y]),
+        x = df_evaluated[x].to_list(), 
+        y = df_evaluated[y].to_list(),
         name = alt_y_name,
         mode = mode,
         legendgroup = group_name,
@@ -116,5 +120,48 @@ def graph_scatter_by_key(
         showlegend = True,
         hovermode='x unified',
     )
+
+    return fig
+
+def graph_all(
+    df: pl.DataFrame,
+    x: str,
+    x_title = None,
+    y_title = '',
+    title = '',
+    color = None,
+    mode = 'lines',
+    group_name: str = None,
+    options: dict = None,
+    fig: go.Figure = None,
+    axis = 1,
+    theme = 'plotly_dark',
+    alt_y_dict = None,
+):
+    keys = [key.name for key in df if key.name != x]
+
+    if fig is None:
+        fig = go.Figure()
+
+    if alt_y_dict is None:
+        alt_y_dict = {}
+
+    for key in keys:
+        graph_scatter_by_key(
+            df = df,
+            x = x,
+            y = key,
+            x_title = x_title,
+            y_title = y_title,
+            title = title,
+            color = color,
+            mode = mode,
+            group_name = group_name,
+            options = options,
+            fig = fig,
+            axis = axis,
+            theme = theme,
+            alt_y_name = alt_y_dict.get(key, key)
+        )
 
     return fig

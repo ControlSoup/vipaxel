@@ -5,7 +5,6 @@ import shutil
 import tarfile 
 import gzip
 from logging import warning 
-import argparse
 
 
 def create_tardb(tarpath: str) -> None:
