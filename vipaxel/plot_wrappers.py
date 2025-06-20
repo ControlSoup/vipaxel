@@ -213,14 +213,17 @@ def graphs_containing(
 
     figs = []
     for contents in conatains_list:
-        figs.append(graph_scatter_by_keylist(
-            df = df,
-            x = x,
-            y_list = [key.name for key in df if contents in key.name],
-            mode = mode,
-            options = options,
-            theme = theme,
-        ))
+        key_list = [key.name for key in df if contents in key.name]
+
+        if len(key_list) > 0:
+            figs.append(graph_scatter_by_keylist(
+                df = df,
+                x = x,
+                y_list = key_list,
+                mode = mode,
+                options = options,
+                theme = theme,
+            ))
     
     return figs
     
