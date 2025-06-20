@@ -1,3 +1,4 @@
+from __future__ import annotations
 import polars as pl
 import plotly.graph_objects as go
 from copy import deepcopy
@@ -123,9 +124,11 @@ def graph_scatter_by_key(
 
     return fig
 
-def graph_all(
+
+def graph_scatter_by_keylist(
     df: pl.DataFrame,
     x: str,
+    y_list: list[str],
     x_title = None,
     y_title = '',
     title = '',
@@ -138,19 +141,17 @@ def graph_all(
     theme = 'plotly_dark',
     alt_y_dict = None,
 ):
-    keys = [key.name for key in df if key.name != x]
-
     if fig is None:
         fig = go.Figure()
 
     if alt_y_dict is None:
         alt_y_dict = {}
 
-    for key in keys:
-        graph_scatter_by_key(
+    for y in y_list:
+        fig = graph_scatter_by_key(
             df = df,
             x = x,
-            y = key,
+            y = y,
             x_title = x_title,
             y_title = y_title,
             title = title,
@@ -161,7 +162,78 @@ def graph_all(
             fig = fig,
             axis = axis,
             theme = theme,
-            alt_y_name = alt_y_dict.get(key, key)
+            alt_y_dict = alt_y_dict.get(y),
         )
 
     return fig
+
+
+def graph_all(
+    df: pl.DataFrame,
+    x: str,
+    x_title: str = None,
+    y_title: str = '',
+    title: str = '',
+    color: str = None,
+    mode: str = 'lines',
+    group_name: str = None,
+    options: dict = None,
+    fig: go.Figure = None,
+    axis: int = 1,
+    theme: str = 'plotly_dark',
+    alt_y_dict: dict = None,
+):
+    key_list = [key.name for key in df if key.name != x]
+
+    return graph_scatter_by_keylist(
+        df = df,
+        x = x,
+        y_list = key_list,
+        x_title = x_title,
+        y_title = y_title,
+        title = title,
+        color = color,
+        mode = mode,
+        group_name = group_name,
+        options = options,
+        fig = fig,
+        axis = axis,
+        theme = theme,
+        alt_y_dict = alt_y_dict,
+    )
+
+def graphs_containing(
+    df, 
+    x, 
+    conatains_list, 
+    mode: str = 'lines', 
+    theme: str = 'plotly_dark',
+    options: dict = None
+) -> list[go.Figure]:
+
+    figs = []
+    for contents in conatains_list:
+        figs.append(graph_scatter_by_keylist(
+            df = df,
+            x = x,
+            y_list = [key.name for key in df if contents in key.name],
+            mode = mode,
+            options = options,
+            theme = theme,
+        ))
+    
+    return figs
+    
+def figs_to_html(*figs, prefix: str = None, export_path: str = None, include_plotlyjs: bool = False):
+
+    if prefix is None:
+        prefix = ''
+
+    for fig in figs:
+        prefix += fig.to_html(full_html = False, include_plotlyjs = include_plotlyjs)
+
+    if export_path is not None:
+        with open(export_path, '+w') as f:
+            f.write(prefix) 
+    
+    return prefix
