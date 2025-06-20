@@ -67,3 +67,31 @@ def string_to_imperial(string: str):
 
     # Replace the text within brackets based on different conditions
     return re.sub(r"\[.*?\]", replace, string)
+
+def get_val_from_string(string: str, out_units: str):
+
+    if '[-]' in string:
+        return float(string.split('[-]')[0])
+
+    # Hacky way to do this but its working?  Should fix at some poitn
+    if ' [' in string:
+        in_units = get_brack_units(string)
+        number = float(eval(string.split(' [')[0]))
+        return convert(number, in_units, out_units)
+    else:
+        return float(string)
+
+def imperial_dictionary(dictionary):
+    imperial = {}
+
+    for key, value in dictionary.items():
+        new_key = string_to_imperial(key)
+        current_units = get_brack_units(key)
+
+        new_units = get_brack_units(new_key)
+        try:
+            imperial[new_key] = convert(value, current_units, new_units)
+        except:
+            raise ValueError(f" CANT CONVERT: {value}, {current_units} to {new_units}")
+
+    return imperial

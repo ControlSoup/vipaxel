@@ -1,6 +1,6 @@
 [project]
 name = "vipaxel"
-version = "0.1.2"
+version = "0.1.3"
 description = "Collection of Dataframe helpers to plot and store data"
 authors = [
     {name = "Joe Shmo",email = "joe.burge.iii@gmail.com"}

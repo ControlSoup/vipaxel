@@ -162,7 +162,7 @@ def graph_scatter_by_keylist(
             fig = fig,
             axis = axis,
             theme = theme,
-            alt_y_dict = alt_y_dict.get(y),
+            alt_y_name = alt_y_dict.get(y),
         )
 
     return fig
